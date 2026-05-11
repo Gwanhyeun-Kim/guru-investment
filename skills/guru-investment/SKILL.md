@@ -237,6 +237,69 @@ Skill(skill="transcript-pulse", args="{ticker} --subcall")
 
 **Edge case**: IPO 첫 분기 종목 (transcript 1개) 또는 fool.com 미커버 small cap의 경우 — transcript-pulse skill 내부 Fallback Handling 적용. 풀 리포트 분석은 정상 진행하되 Part 1.4b 섹션에 "Transcript 데이터 부족으로 분석 제한" 명시.
 
+### Step 2.5c: Super-Investor Reverse Sweep (미장 only)
+
+**미국 상장사 분석 시 필수**. 한국 종목 분석 시 skip (13F는 미국 상장만).
+
+**핵심 가치**: 5인 구루 framework이 외부 검증되는지 확인. 16명 슈퍼투자자가 실제로 이 종목을 보유하는지, 어떤 trajectory (매수·매도·신규·청산) 로 움직이는지 SEC EDGAR 13F-HR을 역방향으로 sweep한다. 단순 "Druckenmiller가 보유" 같은 cherry-pick이 아니라, **16명 전수 결과 + trajectory 분포** = 시장 합의 vs 분기 자동 산출.
+
+**조건**: SEC EDGAR CIK 매핑이 성공한 미장 종목에 한해 실행. CUSIP이 확정되어야 함 (OpenFIGI mapper 또는 ticker → CUSIP 사이트, 또는 직접 한 13F filing에서 issuer name 매칭으로 추출 가능).
+
+**도구**: `guru-13f` skill의 pre-mapped 16명 슈퍼투자자 CIK 매핑 (`~/.claude/skills/guru-13f/known_filers.json`) 을 활용. 16명 = Druckenmiller·Buffett·Burry·Ackman·Tepper·Klarman·Soros·Bridgewater·Citadel·Millennium·Viking·Coatue·Tiger Global·Loeb·Einhorn·Renaissance.
+
+**워크플로우**:
+
+1. **CUSIP 확정**: 종목 ticker → CUSIP 매핑. AMZN = 023135106, AAPL = 037833100, NVDA = 67066G104, MSFT = 594918104, GOOGL = 02079K305 (Class A), META = 30303M102, TSLA = 88160R101.
+
+2. **16명 슈퍼투자자 sweep**: 각 CIK에 대해:
+   - `data.sec.gov/submissions/CIK{cik:010d}.json` → `filings.recent`에서 form == "13F-HR" 또는 "13F-HR/A"인 최근 3건 추출 (필드: `accessionNumber`, `reportDate`, `primaryDocument`)
+   - 각 accession 폴더 listing → `infotable.xml` 또는 유사 파일명 발견
+   - XML 파싱 → CUSIP 매치하는 row만 추출 → `sshPrnamt` (shares) + `value` 합산
+
+3. **3-quarter trajectory 산출** (Q-2 → Q-1 → Q-0 순):
+   - `SCALING_UP_3Q`: q0 > q1 > q2 (3분기 연속 매수)
+   - `SCALING_DOWN_3Q`: q0 < q1 < q2 (3분기 연속 매도)
+   - `REVERSAL_TO_ADD`: q0 > q1, q1 ≤ q2 (트림 후 다시 매수)
+   - `REVERSAL_TO_TRIM`: q0 < q1, q1 ≥ q2 (매집 후 트림)
+   - `RE_ENTRY`: q1 = 0, q0 > 0, q2 > 0 (한 분기 청산 후 재진입)
+   - `NEW_LATEST`: q1 = 0, q0 > 0, q2 = 0 (최신 분기 신규)
+   - `EXITED`: q0 = 0, q1 > 0 (최신 분기 청산)
+   - `HOLDING_STEADY`: q0 == q1 == q2 (3분기 동일)
+   - `NEVER_HELD`: q0 = q1 = q2 = 0
+   - `ADDED_LATEST` / `TRIMMED_LATEST`: 한 분기만 변동
+
+4. **결과 매트릭스 산출 + 보유 강도 종합 + 미보유 명단**.
+
+5. **풀 리포트의 새 섹션 "Part 1.2b: Super-Investor Ownership Sweep"** 추가 (1.2 주주 구조 직후, 1.3 재무 분석 직전). 구조:
+   - 방법론 1단락
+   - 보유자 매트릭스 테이블 (HTML <table>, manager · style · 3 quarters shares · 가치 · trajectory)
+   - 미보유 명단 (NEVER_HELD)
+   - 매수/매도 강도 종합 (강한 매수 / 적당 매수 / 매도 / 미보유 4분류)
+   - "이게 진짜 의미하는 것" 5개 layer 분석 (매크로 vs 가치 진영 분포, 가장 강한 endorsement, 가장 흥미로운 outlier, 신규 진입 패턴, hit rate 비교)
+   - **Cross-Reference 테이블**: 풀 리포트 5인 구루 verdict vs 실제 13F trajectory 일치도 검증
+
+6. **종합 판단 (Part 3) 합의·분기 섹션에 한 줄 추가**: "13F reverse sweep으로 외부 검증됨 — 16명 중 N명 보유, 그중 X명 강한 매수 시그널, 가치 진영 트림 — 풀 리포트 verdict와 정합".
+
+**재현 스크립트**: `scripts/super_investor_sweep.py` (제공). 16명 sweep + trajectory tag + JSON 저장. ThreadPoolExecutor로 병렬 fetch (8 worker) — 약 30초 안에 16 × 3 = 48 13F fetches 완료.
+
+**Edge cases**:
+- 일부 fund (Renaissance Medallion) 는 13F를 제출하지 않음 — RIEF 같은 외부 fund 13F만 보임. 이 점 명시.
+- Berkshire Hathaway는 NWS·NWSA·BRK 같은 특수 CIK 분리. CIK 1067983 사용.
+- value 단위: 13F는 post-2022 $1000 단위 reporting (pre-2022는 $1). 일부 fund 여전히 $단위 사용 — 산출 시 cross-check.
+- CUSIP 변경: 주식분할/합병으로 CUSIP 바뀐 경우 historical CUSIP도 함께 검색.
+- 13F filing 누락: form 13F-NT (no holdings 신고) 도 있음. 무시.
+- 13F 발표 timing: 분기말 +45일. Q4 종료 2025-12-31 → 13F-HR 발표 ~2026-02-15. 즉 Q1 분석 시점 (4월) 의 "최신 13F"는 2025-Q4 데이터.
+
+**검증된 hit rate** (mega-cap 비교, 2026-Q1 13F 기준):
+- NVDA: 15/16 (94%)
+- AMZN: 14/16 (88%) ★ — Burry·Einhorn 패스
+- MSFT: 14/16 (88%)
+- AAPL: 13/16 (81%)
+- GOOGL: 12/16 (75%)
+- META: 11/16 (69%)
+- TSLA: 8/16 (50%)
+- 즉 hit rate 자체가 valuation/sentiment proxy로 활용 가능.
+
 ### Step 2.6: 사용자 제공 리서치 문서 (증권사 리포트 / PDF)
 
 **사용자가 증권사 리포트, 애널리스트 노트, 업계 리포트 등을 첨부한 경우, 이것은 웹 검색 자료보다 우선순위가 높은 1차 소스로 취급한다.** 반드시 전문을 정독하고 분석에 통합한다.
