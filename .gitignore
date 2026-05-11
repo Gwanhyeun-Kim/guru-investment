@@ -1,0 +1,34 @@
+# Secrets
+.env
+.env.local
+*.key
+
+# Generated analysis output (these are user-specific, not shared)
+*_data/
+*_멀티구루_*.md
+*_투자검토_*.md
+*.pdf
+*.docx
+*.xlsx
+chart_*.png
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code internal state
+.omc/
