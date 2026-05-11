@@ -221,7 +221,19 @@ Skill(skill="transcript-pulse", args="{ticker} --subcall")
 
 **중요**: Subcall mode일 때는 **HTML table 사용** (저장 .md용 — 사용자 양식 룰). Stand-alone 채팅 응답일 때만 pipe table OK.
 
-자세한 워크플로우 및 출력 template은 `~/.claude/skills/transcript-pulse/SKILL.md` 참조.
+**T0 전문 임베드는 Obsidian native callout `> [!quote]- {title}` 사용 (절대 규칙, 2026-05-11 BE 분석에서 확정):**
+
+`<details>` HTML 블록은 사용 금지. 본문 안에 markdown heading(`### X`)·수평선(`---`)·unbalanced `==`/`**` 한 줄만 있어도 통째 깨져서 본문이 펴진 채로 새어나오는 함정이 있다 (BE Bloom Energy 분석에서 첫 발견). HTML 변환(`<h4>`, `<hr>`)으로 부분 fix 시도해도 unbalanced `==` 한 곳만 있으면 또 깨진다.
+
+대신 Obsidian native callout `> [!quote]-` 사용:
+- 헤더: `> [!quote]- ★ {분기} Earnings Call 전문 (verbatim, 핵심 문장 하이라이트). 클릭하여 펼치기.`
+- `-` 접미사가 "기본 접힌 상태" 보장 (`+`면 펴진 상태로 시작)
+- 모든 본문 줄에 `> ` prefix. 빈 줄에도 `>` 단독.
+- 본문 안 markdown heading `> #### X` 그대로. `> ---` 수평선 그대로. `==하이라이트==` · `**bold**` 동작.
+- callout 종료는 `>` 없는 다음 줄로 자동.
+- 작성 직후 검증: callout 라인 범위 안 각 줄 `==` 개수 짝수. `awk -F '==' '{if((NF-1)%2!=0) print NR": "$0}' < block` 실행해서 출력 없으면 OK.
+
+자세한 워크플로우 및 출력 template은 `~/.claude/skills/transcript-pulse/SKILL.md` 참조 (해당 스킬에도 동일 룰 박힘).
 
 **Edge case**: IPO 첫 분기 종목 (transcript 1개) 또는 fool.com 미커버 small cap의 경우 — transcript-pulse skill 내부 Fallback Handling 적용. 풀 리포트 분석은 정상 진행하되 Part 1.4b 섹션에 "Transcript 데이터 부족으로 분석 제한" 명시.
 
@@ -896,8 +908,8 @@ Part 1의 데이터를 구체적으로 인용하면서 분석.]
 **파일명**: `{종목명_or_TICKER}_투자검토_{YYYYMMDD}.md`
 
 **저장 경로**: 풀 리포트와 동일 폴더 (Desktop + Obsidian 양쪽)
-- Local: `~/Desktop/Investment Research/{종목명 or TICKER}/` (또는 본인 선호 경로)
-- (Optional) Obsidian vault: `{vault_root}/Investment Research/{KR_stocks or US Stocks}/{종목명 or TICKER}/`
+- `~/Desktop/Claude/Investment Research/{종목명 or TICKER}/`
+- Obsidian `Secretary/Investment Research/{KR_stocks or US Stocks}/{종목명 or TICKER}/`
 
 **분량**: 3-5K chars (1-2 페이지). CEO·투자집행자가 30초~1분에 읽고 결정.
 
@@ -1014,9 +1026,10 @@ tags:
   - **WebSearch로 주가/시총을 가져오지 않는다.** KRX API가 1차 소스다.
   - DART(펀더멘탈) + KRX(시장 데이터) 조합으로 밸류에이션 멀티플(PER, PBR, EV/EBITDA, PSR 등)을 직접 산출한다.
 - **분석 결과물 저장 (필수)**:
-  - 분석 완료 후 마크다운(.md) 파일로 저장한다. 본인 환경에 맞게 경로 customize 가능.
-  - **Local (default)**: `~/Desktop/Investment Research/{종목명 or Ticker}/` (또는 본인 선호 경로)
-  - **(Optional) Obsidian vault**: Obsidian을 사용한다면 `{vault_root}/Investment Research/{KR_stocks or US Stocks}/{종목명 or Ticker}/`. iCloud sync vault 경로 예: `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/{YourVault}/`
+  - 분석 완료 후 마크다운(.md) 파일로 저장한다. **항상 두 곳 모두 저장.**
+  - **Obsidian**: `Secretary/Investment Research/KR_stocks/{종목명}/` (한국 주식) 또는 `Secretary/Investment Research/US Stocks/{Ticker}/` (미국 주식)
+  - **Desktop**: `~/Desktop/Claude/Investment Research/{종목명 or Ticker}/`
+  - Obsidian iCloud 루트: `/Users/jason/Library/Mobile Documents/iCloud~md~obsidian/Documents/`
   - **파일명**: `{종목명}_{분석유형}_{YYYYMMDD}.md` (예: `삼성전자_멀티구루_20260410.md`)
   - **같은 종목 재분석 시**: 기존 파일 덮어쓰지 않고 새 날짜로 생성 (히스토리 보존)
   - **YAML frontmatter** 포함:

@@ -1,6 +1,6 @@
-# guru-investment + transcript-pulse
+# guru-investment + transcript-pulse + guru-13f
 
-Claude Code skills for **institutional-grade stock analysis** through the lens of legendary investors (Buffett, Marks, Lynch, Dalio, Soros, Druckenmiller, Minervini, O'Neil, Greenblatt, Aschenbrenner), with automated data collection from SEC EDGAR, DART (Korea), KRX, FRED, and fool.com earnings call transcripts.
+Claude Code skills for **institutional-grade stock and super-investor portfolio analysis** through the lens of legendary investors (Buffett, Marks, Lynch, Dalio, Soros, Druckenmiller, Minervini, O'Neil, Greenblatt, Aschenbrenner), with automated data collection from SEC EDGAR, DART (Korea), KRX, FRED, fool.com earnings call transcripts, and SEC 13F-HR filings.
 
 ## What's included
 
@@ -28,9 +28,19 @@ Analyzes the last 3 quarters of fool.com earnings call transcripts to extract:
 - **Tone Shift**: phrase intensity changes on the same topic across quarters (e.g., "exploring" → "expect" → "highest conviction ever")
 - **Faded narrative**: topics emphasized previously but dropped in the latest call
 - **Analyst Q&A concerns**: what analysts keep probing (avoidance vs direct answers)
-- **T0 standalone summary**: standalone analysis of the most recent call with verbatim quotes and `==highlights==`
+- **T0 standalone summary**: standalone analysis of the most recent call with verbatim quotes and `==highlights==`. Verbatim transcript embedded in collapsible Obsidian callout (`> [!quote]-`) — survives heading/HR/unbalanced-highlight rendering bugs that break raw `<details>` blocks.
 
 Designed to slot into `guru-investment` as a sub-call on US stocks, or run standalone with `transcript pulse {TICKER}`.
+
+### 3. `guru-13f/` — Super-Investor 13F Tracker
+
+Tracks the most recent 3 quarterly 13F-HR filings of any SEC-registered institutional investor (Druckenmiller, Buffett, Burry, Ackman, Tepper, Klarman, Soros, Bridgewater, Citadel, Viking, Coatue, Tiger Global, Renaissance, Greenlight, Third Point, Millennium, Pershing Square — 16 pre-mapped, plus EDGAR company search for unknown filers). Output:
+- **Position-level matrix** (NEW / ADD / HOLD / TRIM / EXIT vs prior quarter)
+- **Multi-quarter trajectory tags** (11 classes — `SCALING_UP`, `SCALING_DOWN`, `NEW_AND_ADDING`, `NEW_AND_TRIMMING`, `REVERSAL_TO_ADD`, `REVERSAL_TO_TRIM`, `HOLDING_STEADY`, etc.) that distinguish "conviction-confirming" from "test-and-retreat" patterns single-quarter analysis misses.
+- **6 auto-generated PNG charts** — AUM history, Top-15 holdings ribbon, Top-15 share trajectory, status distribution, trajectory distribution, biggest NEW vs EXIT.
+- **Korean-language report** — macro thesis interpretation through Druckenmiller's reference framework + cross-reference to the user's Korean portfolio holdings.
+
+Run with `python3 scripts/fetch_compare.py {CIK} 3 output/{slug}` → `python3 scripts/visualize.py output/{slug}` → Claude writes the report from `comparison.json`. SEC EDGAR direct API, no key required (only User-Agent header).
 
 ## Output structure
 
@@ -50,6 +60,7 @@ cd guru-investment
 # Copy skills to Claude Code skills directory
 cp -R skills/guru-investment ~/.claude/skills/
 cp -R skills/transcript-pulse ~/.claude/skills/
+cp -R skills/guru-13f ~/.claude/skills/
 
 # Install Python dependencies
 pip3 install --user requests beautifulsoup4 yfinance matplotlib
@@ -82,12 +93,18 @@ guru investment NVDA
 
 # Standalone earnings call analysis
 transcript pulse AAPL
+
+# Super-investor 13F tracking (3-quarter comparison + 6 charts)
+guru 13f druckenmiller
+guru 13f buffett
+guru 13f burry
 ```
 
 Or use the slash command form:
 ```
 /guru-investment {ticker_or_name}
 /transcript-pulse {US_TICKER}
+/guru-13f {filer_name_or_CIK}
 ```
 
 ## Output organization

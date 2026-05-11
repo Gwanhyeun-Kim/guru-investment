@@ -1,0 +1,117 @@
+{
+  "_comment": "Known 13F filers. CIK is the SEC Central Index Key. Verify by querying https://data.sec.gov/submissions/CIK{cik:010}.json before use — entity names can change and CIK gets reassigned rarely. For unknown filers, use SEC EDGAR company search.",
+  "filers": {
+    "druckenmiller": {
+      "cik": "1536411",
+      "entity": "Duquesne Family Office LLC",
+      "manager": "Stanley Druckenmiller",
+      "aliases": ["duquesne", "stanley druckenmiller", "stan druckenmiller", "drucken"],
+      "style": "concentrated macro, regime rotation"
+    },
+    "buffett": {
+      "cik": "1067983",
+      "entity": "Berkshire Hathaway Inc",
+      "manager": "Warren Buffett",
+      "aliases": ["berkshire", "warren buffett", "berkshire hathaway", "brk"],
+      "style": "quality compounders, long-term holdings"
+    },
+    "burry": {
+      "cik": "1649339",
+      "entity": "Scion Asset Management LLC",
+      "manager": "Michael Burry",
+      "aliases": ["scion", "michael burry", "dr burry", "big short"],
+      "style": "contrarian deep value, macro hedges"
+    },
+    "ackman": {
+      "cik": "1336528",
+      "entity": "Pershing Square Capital Management LP",
+      "manager": "Bill Ackman",
+      "aliases": ["pershing square", "bill ackman", "pershing"],
+      "style": "concentrated activist quality"
+    },
+    "einhorn": {
+      "cik": "1079114",
+      "entity": "Greenlight Capital Inc",
+      "manager": "David Einhorn",
+      "aliases": ["greenlight", "david einhorn"],
+      "style": "long/short value"
+    },
+    "loeb": {
+      "cik": "1040273",
+      "entity": "Third Point LLC",
+      "manager": "Daniel Loeb",
+      "aliases": ["third point", "dan loeb", "daniel loeb"],
+      "style": "event-driven activist"
+    },
+    "tepper": {
+      "cik": "1656456",
+      "entity": "Appaloosa LP",
+      "manager": "David Tepper",
+      "aliases": ["appaloosa", "david tepper"],
+      "style": "distressed credit + macro equity"
+    },
+    "klarman": {
+      "cik": "1061165",
+      "entity": "Baupost Group LLC",
+      "manager": "Seth Klarman",
+      "aliases": ["baupost", "seth klarman"],
+      "style": "deep value, special situations"
+    },
+    "simons": {
+      "cik": "1037389",
+      "entity": "Renaissance Technologies LLC",
+      "manager": "Jim Simons (Renaissance)",
+      "aliases": ["renaissance", "rentech", "jim simons", "medallion"],
+      "style": "quant systematic (13F = stat arb book only)"
+    },
+    "soros": {
+      "cik": "1029160",
+      "entity": "Soros Fund Management LLC",
+      "manager": "George Soros / Robert Soros",
+      "aliases": ["soros", "george soros", "soros fund"],
+      "style": "macro reflexivity"
+    },
+    "dalio": {
+      "cik": "1350694",
+      "entity": "Bridgewater Associates LP",
+      "manager": "Ray Dalio (Bridgewater)",
+      "aliases": ["bridgewater", "ray dalio", "all-weather"],
+      "style": "risk-parity macro"
+    },
+    "citadel": {
+      "cik": "1423053",
+      "entity": "Citadel Advisors LLC",
+      "manager": "Ken Griffin",
+      "aliases": ["citadel", "ken griffin"],
+      "style": "multi-strategy"
+    },
+    "millennium": {
+      "cik": "1273087",
+      "entity": "Millennium Management LLC",
+      "manager": "Israel Englander",
+      "aliases": ["millennium", "izzy englander"],
+      "style": "multi-strategy pod"
+    },
+    "viking": {
+      "cik": "1103804",
+      "entity": "Viking Global Investors LP",
+      "manager": "O. Andreas Halvorsen",
+      "aliases": ["viking global", "andreas halvorsen", "tiger cub"],
+      "style": "long/short fundamental"
+    },
+    "coatue": {
+      "cik": "1135730",
+      "entity": "Coatue Management LLC",
+      "manager": "Philippe Laffont",
+      "aliases": ["coatue", "philippe laffont"],
+      "style": "TMT growth"
+    },
+    "tiger_global": {
+      "cik": "1167483",
+      "entity": "Tiger Global Management LLC",
+      "manager": "Chase Coleman",
+      "aliases": ["tiger global", "chase coleman"],
+      "style": "growth tech"
+    }
+  }
+}

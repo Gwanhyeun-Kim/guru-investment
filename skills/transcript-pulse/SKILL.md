@@ -143,25 +143,21 @@ T-1, T-2에서 강조됐는데 T0에서 빠진 것.
 
 ### Step 4: Korea Portfolio Cross-Reference
 
-사용자가 별도로 한국(또는 다른 시장) 종목 분석을 저장한 위치가 있다면 자동 스캔하여 미장 시그널이 그 종목 thesis에 미치는 영향 식별. **이 단계는 선택사항** — 사용자가 cross-reference 대상 노트가 없다면 skip.
+사용자 메모리의 한국 보유/관심 종목 분석 결과를 자동 스캔하여 미장 시그널이 한국 종목 thesis에 미치는 영향 식별.
 
-**스캔 대상 (사용자가 customize)**:
+**스캔 대상**:
 ```bash
-# 예시: Claude memory directory (oh-my-claudecode 사용자)
-ls ~/.claude/projects/-Users-{username}/memory/project_*_guru_analysis.md
-
-# 또는 Obsidian vault 내 분석 노트
-ls {vault_root}/Investment\ Research/KR_stocks/**/*.md
+ls /Users/jason/.claude/projects/-Users-jason/memory/project_*_guru_analysis.md
 ```
 
-본 skill에는 cross-reference 대상이 하드코딩되어 있지 않음. 사용자가 자신의 한국 portfolio thesis 노트 경로를 지정하면 그 폴더 내 .md 파일들을 grep으로 키워드 매칭.
+현재 한국 보유 추적 종목 예시 (수시 업데이트): SKT, 한선엔지니어링, HD현대일렉트릭, 효성중공업, LS ELECTRIC, 대한전선, SK이노베이션, 후성, 가온전선, 인텔리안테크.
 
 **판단 방식**:
 1. 미장 종목 transcript에서 발견한 시그널의 핵심 키워드 추출 (예: "Permian data center", "AI capex acceleration", "Hormuz oil supply", "AI infrastructure power", "HBM demand")
-2. 사용자 한국 종목 노트들을 grep으로 관련 키워드 검색
+2. 각 한국 종목 메모리 파일을 grep으로 관련 키워드 검색
 3. 관련성 확인된 종목에 대해 1-2 문장으로 cross-impact 서술
 
-**출력**: "한국(또는 타 시장) 포트폴리오 implications" 섹션 1-2 단락. 관련 종목이 없거나 cross-reference 대상이 설정되지 않은 경우 이 섹션 omit.
+**출력**: "한국 포트폴리오 implications" 섹션 1-2 단락. 관련 한국 종목이 없으면 명시적으로 "직접적 cross-impact 없음" 표시.
 
 ---
 
@@ -208,37 +204,57 @@ ls {vault_root}/Investment\ Research/KR_stocks/**/*.md
 
 WebFetch로 T0 transcript를 prepared remarks (CEO + CFO) + analyst Q&A 두 파트로 나누어 verbatim 가져온 후, `<details>` 블록으로 통째 임베드. 핵심 alpha 시그널 문장에 `==하이라이트==` (Obsidian 형광펜) 적용.
 
-```html
-<details>
-<summary><b>★ {분기} Earnings Call 전문 (verbatim, 핵심 문장 하이라이트). 펼쳐서 보기.</b></summary>
+**T0 전문은 `<details>` 대신 Obsidian native callout `> [!quote]-` 사용 (절대 규칙).**
 
-**출처**: [fool.com transcript]({T0_URL}) | 발표일 {date}
+`<details>`는 본문에 markdown heading·수평선·unbalanced `==`/`**`가 하나라도 있으면 통째 깨져서 본문이 펴진 채로 새어나오는 함정이 있다 (BE Bloom Energy 분석에서 첫 발견·확정, 2026-05-11). Obsidian native callout은 동일 기능을 더 안정적으로 제공하며, 안에 markdown heading/하이라이트/링크 모두 정상 동작한다.
 
----
+**Callout 규칙:**
+1. 헤더는 `> [!quote]- {title}` — `-` 접미사가 "기본 접힌 상태"를 보장.
+2. 모든 본문 줄에 `> ` prefix 필수. 빈 줄에도 `>` 단독.
+3. 본문 안 markdown heading은 `> #### X` 형식 그대로. ATX heading 사용 OK.
+4. 본문 안 수평선은 `> ---` 그대로. OK.
+5. `==하이라이트==`·`**bold**`는 callout 안에서 작동. 단 한 줄 안에서 짝이 반드시 맞아야 함 (글로벌 룰).
+6. callout 종료는 `>` 가 없는 다음 줄로 자동.
+7. 작성 직후 셀프 grep:
+   - `grep -nE '^> \[!quote\]' file` 로 callout 시작 확인
+   - 각 줄 `awk -F '==' '{print NF-1, $0}' callout_block` 로 `==` 짝수 확인 (홀수 = 깨짐)
 
-### Operator Intro
-{IR 담당자 intro 전문}
-
----
-
-### CEO {이름} — Prepared Remarks
-{CEO 발언 verbatim 전체. 핵심 문장은 ==하이라이트== 또는 ==**볼드+하이라이트**==}
-
----
-
-### CFO {이름} — Prepared Remarks
-{CFO 발언 verbatim 전체. 정량 가이던스·실적 수치 ==하이라이트==}
-
----
-
-### Analyst Q&A
-#### Q1 — {분석사 + 분석사 이름}
-**{이름}**: {질문 verbatim}
-**CEO**: {답변 verbatim, 핵심 ==하이라이트==}
-... (모든 Q&A 동일)
-
-</details>
+```markdown
+> [!quote]- ★ {분기} Earnings Call 전문 (verbatim, 핵심 문장 하이라이트). 클릭하여 펼치기.
+>
+> **출처**: [fool.com transcript]({T0_URL}) | 발표일 {date}
+>
+> ---
+>
+> #### Operator Intro
+>
+> {IR 담당자 intro 전문}
+>
+> ---
+>
+> #### CEO {이름} — Prepared Remarks
+>
+> {CEO 발언 verbatim. 핵심 문장 ==하이라이트== 또는 ==**볼드+하이라이트**==}
+>
+> ---
+>
+> #### CFO {이름} — Prepared Remarks
+>
+> {CFO 발언 verbatim. 가이던스·실적 수치 ==하이라이트==}
+>
+> ---
+>
+> #### Analyst Q&A
+>
+> ##### Q1 — {분석사}
+>
+> **{이름}**: {질문 verbatim}
+> **CEO**: {답변 verbatim, 핵심 ==하이라이트==}
+> ... (모든 Q&A 동일)
 ```
+
+**구 `<details>` 작성 패턴 (deprecated, 다음과 같은 경우만 허용):**
+- 본문이 5줄 미만의 짧은 plain text일 때 (예: 의대 분집 정답 한 줄). markdown heading·`==`·`**` 다수 사용 시에는 무조건 callout 사용.
 
 **하이라이트 대상 (alpha 시그널 우선순위)**:
 1. 새로운 가이던스 수치 (revenue, OPM, EPS, cash 등 raise/cut)
