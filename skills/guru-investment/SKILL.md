@@ -1044,6 +1044,241 @@ tags:
 
 검증 실패 시 저장 전 inline 수정.
 
+### Step 3.6: Thesis 설득 보고서 자동 생성 (필수, 모든 분석)
+
+**Step 3 풀 리포트 + Step 3.5 압축 투자검토 보고서 작성 직후, 항상 별도 thesis 설득 보고서를 .md로 추가 생성한다.** Bull thesis(BUY)와 Bear thesis(SELL/AVOID) 두 케이스 모두 동일하게 작성. 한국·미국 종목 모두 적용.
+
+**핵심 원칙 — Bear thesis도 동일 분량 + 동일 구조**: Bull thesis(BE 케이스)는 자연스럽게 "왜 사야 하는지" 설득 페이퍼지만, Bear thesis(NVTS 케이스)도 동일하게 작성해야 한다. SELL 종목 회피는 chase 종목일수록 BUY 설득보다 더 강한 narrative + 데이터가 필요하기 때문. **"Bear는 회피 메모로 충분하다"는 무의식적 가정 절대 금지**.
+
+**파일명**: `{종목명_or_TICKER}_thesis_{YYYYMMDD}.md`
+
+**저장 경로**: 풀 리포트와 동일 폴더 (Desktop + Obsidian 양쪽)
+- `~/Desktop/Claude/Investment Research/{종목명 or TICKER}/`
+- Obsidian `Secretary/Investment Research/{KR_stocks or US Stocks}/{종목명 or TICKER}/`
+
+**분량**: 40~60KB (700~1000줄). 압축 메모(5KB)와 풀 리포트(100KB+) 사이의 mid-depth 설득 페이퍼. **셀사이드 컨센이 보지 못한 알파 위치 또는 시장이 narrative re-rating한 위치를 짚는 것이 목적**.
+
+**Template (13개 섹션)**:
+
+```markdown
+---
+tags:
+  - investment
+  - investment/{KR 또는 US}
+  - investment/{종목명}
+  - thesis
+  - bull-thesis 또는 bear-thesis
+  - {산업 테마 1~3개}
+aliases:
+  - {종목명} thesis
+  - 왜 {종목명}을 {사야/피해야} 하는가
+date: YYYY-MM-DD
+ticker: {TICKER}
+market: {NASDAQ/NYSE/KOSPI/KOSDAQ}
+cik: "{10자리 CIK 미장만}"
+---
+
+# 왜 {종목명}을 {사야/피해야} 하는가 — {Bull/Bear} Thesis 설득 보고서
+
+> **분석 시점**: YYYY-MM-DD (어닝콜 N일 후 / 핵심 catalyst 시점 + 거리)
+> **현재가**: ${가격} ({거래소}, 시총 ${시총}B FD)
+> **52주 범위**: ${저점} ~ ${고점} (현재 +/-% from high, +/-x from low)
+> **Beta**: {beta} (변동성 — 포지션 사이징)
+> **이 문서의 목적**: {Bull = 셀사이드 컨센이 보지 못한 옵션 N개를 짚어 추가 알파} / {Bear = retail momentum이 컨센을 추월한 정확한 구간을 짚어 chase 함정 회피}
+> **핵심 입력**: Q{최근} 어닝 transcript verbatim + transcript-pulse 3분기 + 13F-HR sweep + 18개월 공시 + 산업 cross-reference
+> **별도 정식 분석**: [[{종목}_멀티구루_{YYYYMMDD}]] (풀 리포트) · [[{종목}_투자검토_{YYYYMMDD}]] (압축 메모)
+> **자매 thesis (대조 케이스)**: [[유사 thesis 종목]] (반대 verdict, 대조 케이스)
+
+![핵심 차트 1 — 가격/MA/이벤트 annotation](chart_price_climax.png 또는 chart_price_ma.png)
+
+![핵심 차트 2 — 대조 케이스 vs 본 종목 매트릭스](chart_be_vs_xxx.png 또는 산업 비교 차트)
+
+---
+
+## thesis 인과 체인 — 한 장 요약
+
+```mermaid
+flowchart TD
+    {매크로 트리거} --> {중간 인과}
+    {중간 인과} --> {본 종목 포지션}
+    {Catalyst 1} -.->|확정/시그널| {본 종목 포지션}
+    {Catalyst 2} -.->|확정/시그널| {본 종목 포지션}
+
+    style 본 종목 fill:#1E3A5F,stroke:#1E3A5F,color:#fff
+```
+
+## 도입 — 미장/한국 단일 노출 종목
+
+매크로 thesis 한 줄 → 세 박힘 신호 (Recent earnings call + 13F 시그널 + 산업 catalyst) 정리.
+
+## 0. 한 문단 요약 — CEO/CFO 발언 verbatim
+
+> CEO/CFO 컨콜 인용구 (Obsidian callout `> [!quote]-` 사용 가능)
+
+핵심 인과 5~7개 압축.
+
+## 1. 컨센서스 점검 — 셀사이드 컨센 정리
+
+미장 셀사이드 N곳 + 한국 증권사 N곳 컨센 매트릭스 (HTML <table>, 증권사·rating·TP·매출·OPM). **Bull**: 셀사이드 합의 + 본인이 보강할 옵션 N개. **Bear**: 셀사이드 caution + 시장 가격이 컨센을 추월한 분량.
+
+## 2. 펀더멘털 검증 1단계 — 최근 어닝 surprise
+
+![분기 매출 chart](chart_quarterly_revenue.png 또는 chart_quarterly_inflection.png)
+
+분기 매출·EPS·GM·가이던스 raise 매트릭스. **Bull**: 변곡점 박힘. **Bear**: 인플렉션의 한계 (절대 사이즈, YoY 여전 마이너스).
+
+## 3. 펀더멘털 검증 2단계 — 핵심 commitment
+
+CEO/CFO 컨콜 verbatim 인용 5~7개 + 정량적 commitment (capacity, 가이드, attach rate 등).
+
+## 4. 차별화 포지션 — 경쟁사 매트릭스
+
+차원별 비교표 (시장 점유율, 비즈니스 모델, 양산 시점, 흑자 여부, R&D 누적, 특허). **Bull**: 명확한 #1 또는 monopoly position. **Bear**: 어느 차원에서도 #1 아님.
+
+## 5. {AI 인프라/EV/그리드 등} picks-and-shovels 비교
+
+![PSR 또는 valuation 비교 chart](chart_psr_comparison.png)
+
+같은 thesis 동료 그룹과 valuation 비교. **Bull**: 정상 PSR 정당화. **Bear**: outlier 분석 + mean reversion 시나리오.
+
+## 6. 컨센 위 옵션 / 아래 리스크
+
+### {Bull} 옵션 3개 vs {Bear} Hidden catalysts 5개
+
+각 항목별 구체 시나리오 + 확률 + 영향. **Bull**: 컨센 미반영 upside 옵션. **Bear**: 컨센이 보지 못한 downside catalyst.
+
+![13F sweep chart (미장만)](chart_13f_sweep.png)
+
+![인사이더 매도/매수 timeline](chart_insider_distribution.png)
+
+## 7. {확장/리스크} 한 줄 정리 (표)
+
+레이어 · 트리거 · 매출/주가 영향 · 컨센 반영 여부 · Timeline.
+
+## 8. Catalyst Timeline — 24개월 가시화 경로 (Gantt)
+
+```mermaid
+gantt
+    title {Bull/Bear} catalyst timeline 24개월
+    dateFormat YYYY-MM
+    section 분기 어닝
+    Q{N} 26 어닝       :crit, YYYY-MM, 1M
+    ...
+```
+
+분기 어닝 · 매출 인식 · 자본 시그널 · 매크로 등 섹션 분리.
+
+## 9. 진입 / 회피 논리 — 3단 구조
+
+**Bull**: 1단계 베이스 (이미 가격 반영) → 2단계 24개월 가시화 catalyst → 3단계 장기 옵션.
+**Bear**: 1단계 절대 회피 영역 (현재가) → 2단계 pullback 진입 검토 영역 → 3단계 적극 매수 영역.
+
+## 10. 가격 시나리오 — 4~5분류 + 기댓값
+
+Bear / Base / Bull / Super Bull (또는 Super Bear / Bear / Base / Bull / Super Bull) 5분류:
+- 각 EPS 또는 매출 가정
+- 적용 PER/PSR
+- 주가 시나리오 가격
+- 현재 대비 변동
+- **실현 확률 (정직)**
+
+기댓값 = Σ(확률 × 수익률). 비대칭 R/R 명시.
+
+## 11. 리스크 — 본 thesis가 깨질 시나리오 (정직)
+
+**Bull thesis**: A~G 6~7개 (AI capex reverse, hyperscaler insourcing, margin compression 등) + 각 확률·영향.
+**Bear thesis**: A~F 6개 (반대 시나리오 — Bull이 맞을 경로) + 각 확률·영향. **정직하게 본 thesis가 틀릴 수 있는 경로 짚기**.
+
+## 12. 결론
+
+3 핵심 한 줄 + TP (3~5 horizon).
+
+## 13. 마지막 — 셀사이드와 다른 단 한 가지 (Bull) / 셀사이드와 일치하는 단 하나 (Bear)
+
+본 thesis의 핵심 알파/anti-alpha 위치 한 단락.
+
+## 14. 한국 포트폴리오 cross-reference
+
+한국 보유·관심 종목과의 관계 표 + 실행 우선순위.
+
+## 면책
+
+데이터 소스 + 추정 부분 명시 + Beta 변동성 + Disclaimer.
+
+---
+
+**관련**: [[Investment Research]]
+**관련 분석**: [[{종목}_멀티구루_{YYYYMMDD}]] · [[{종목}_투자검토_{YYYYMMDD}]] · [[대조 케이스 thesis]]
+**관련 종목 (한국 짝)**: [[관련 한국 종목 1]] · [[관련 한국 종목 2]]
+**관련 매크로**: [[AGI 인프라]] [[OOMs Aschenbrenner]] [[기타 thesis]]
+```
+
+**검증**: 저장 전 grep 셀프 검증 (사용자 양식 룰):
+- `^\|.*\|.*\|$` → 0건 (파이프 테이블 금지)
+- `\*\*[^*]*["')\].,!?;:”’」』》]\*\*[가-힣]` → 0건
+
+**Bull/Bear 비대칭 인지편향 방지**: Bull thesis와 Bear thesis는 동일 분량(700~1000줄), 동일 13개 섹션 구조, 동일 차트 5~6개 임베드, 동일 정직 risk 평가. 절대 Bear를 "회피 메모"로 단축하지 말 것.
+
+### Step 3.7: 차트 5~6개 표준 자동 생성 (필수, 모든 분석)
+
+**thesis 보고서에 임베드할 차트 5~6개를 항상 matplotlib으로 생성한다.** `references/mckinsey-chart-style-guide.md` 가이드 + 한글 폰트 적용.
+
+#### 차트 6종 표준 라인업
+
+종목별 사정에 맞춰 5~6개 선택 (반드시 thesis 보고서에 모두 임베드):
+
+<table>
+<thead><tr><th>#</th><th>파일명</th><th>목적</th><th>임베드 위치</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>chart_price_climax.png</code> 또는 <code>chart_price_ma.png</code></td><td>1년 가격 + MA50/150/200 + 핵심 catalyst annotation + 거래량 (서브플롯)</td><td>도입부 직후 (Mermaid 인과 체인 다음)</td></tr>
+<tr><td>2</td><td><code>chart_be_vs_xxx.png</code> 또는 <code>chart_company_vs_peer.png</code></td><td>대조 케이스 (Bull은 BE 같은 자매, Bear는 본인 vs 동료 그룹 매트릭스)</td><td>도입부 직후 또는 0. 한 문단 요약 다음</td></tr>
+<tr><td>3</td><td><code>chart_quarterly_inflection.png</code> 또는 <code>chart_quarterly_revenue.png</code></td><td>분기 매출 추이 8~12분기 (peak·trough·inflection annotation)</td><td>2. 펀더멘털 검증 1단계</td></tr>
+<tr><td>4</td><td><code>chart_psr_comparison.png</code> 또는 <code>chart_eps_surprise.png</code></td><td>peer 그룹 vs 본 종목 valuation 비교 (PSR/PER/EV-Revenue), Bull은 EPS surprise 패턴</td><td>5. picks-and-shovels 비교</td></tr>
+<tr><td>5</td><td><code>chart_13f_sweep.png</code> (미장만)</td><td>16명 슈퍼투자자 보유율 비교 + 본 종목 위치 (NEW/SCALING_UP/NEVER_HELD)</td><td>3. 펀더멘털 검증 2단계 또는 도입 (3) 박힘 신호</td></tr>
+<tr><td>6</td><td><code>chart_insider_distribution.png</code> 또는 <code>chart_capacity_roadmap.png</code></td><td>인사이더 매도/매수 timeline (Bear) 또는 capacity/매출 forecast roadmap (Bull)</td><td>6. Hidden catalysts / 옵션 섹션</td></tr>
+</tbody>
+</table>
+
+#### matplotlib 표준 코드 (한글 폰트 + McKinsey 색)
+
+모든 차트 스크립트 도입부에 다음을 포함:
+
+```python
+import matplotlib
+import matplotlib.pyplot as plt
+
+# 한글 폰트 (macOS 기본) + minus 부호
+matplotlib.rcParams['font.family'] = ['Apple SD Gothic Neo', 'AppleGothic', 'Nanum Gothic', 'Arial']
+matplotlib.rcParams['axes.unicode_minus'] = False
+
+# McKinsey 스타일 색 (실무 검증된 변형)
+COLOR_NAVY    = '#1E3A5F'  # 주요 데이터 시리즈
+COLOR_RED     = '#C8454C'  # 경고·negative
+COLOR_GREEN   = '#3FA796'  # 긍정·growth
+COLOR_ORANGE  = '#E89F3D'  # 강조·catalyst
+COLOR_GRAY    = '#6B7280'  # 보조 데이터
+COLOR_LIGHT_GRAY = '#D1D5DB'  # 배경·grid
+COLOR_DARK_RED = '#8B0000'  # 핵심 경고
+
+plt.rcParams.update({
+    'axes.spines.top': False, 'axes.spines.right': False,
+    'axes.edgecolor': '#374151', 'axes.linewidth': 0.8,
+    'xtick.color': '#374151', 'ytick.color': '#374151',
+    'axes.labelcolor': '#374151',
+    'figure.facecolor': 'white', 'axes.facecolor': 'white',
+})
+```
+
+**Action title 룰 (McKinsey)**: 차트 제목은 "Revenue by Segment"같은 descriptive 라벨 X. "분기 매출 — Q1 26 +18% QoQ 첫 회복" 같은 **full-sentence 인사이트** O.
+
+**Source attribution**: 모든 차트 하단에 작은 회색 글씨로 `Source: SEC EDGAR + yfinance + 13F-HR sweep, YYYY-MM-DD` 명시.
+
+**임베드 형식**: thesis 보고서에 `![캡션 — 핵심 인사이트 한 줄](chart_xxx.png)` 형식으로 임베드. 캡션 자체가 추가 narrative.
+
+**저장 경로**: 풀 리포트와 동일 폴더 (Desktop + Obsidian 양쪽).
+
+**검증**: 차트 생성 후 `Read` tool로 png 확인 → 한글 폰트 정상 렌더 + 인사이트 명확 + 색 일관성 OK 시 임베드.
+
 ### Step 4: Apply intellectual honesty & depth standards
 
 - If a guru's framework doesn't apply well to the situation, say so explicitly rather than forcing it

@@ -42,13 +42,56 @@ Tracks the most recent 3 quarterly 13F-HR filings of any SEC-registered institut
 
 Run with `python3 scripts/fetch_compare.py {CIK} 3 output/{slug}` → `python3 scripts/visualize.py output/{slug}` → Claude writes the report from `comparison.json`. SEC EDGAR direct API, no key required (only User-Agent header).
 
-## Output structure
+## Output structure (v2 — 3 documents + 5-6 charts, all required)
 
-Each analysis produces:
-1. **Full multi-guru report** (~50-90K chars) — Part 1 company deep-dive + Part 2 guru frameworks + Part 3 investment verdict
-2. **Compressed CEO decision memo** (~3-5K chars) — 1-2 page thesis paper with BUY/HOLD/SELL/AVOID verdict, 3 key arguments, biggest risk, position management plan
+Each analysis produces **3 markdown deliverables + 5-6 embedded charts**. None is optional. Bull thesis and Bear thesis follow the same structure and length — no asymmetry, no shortcuts.
 
-Reports include 5+ McKinsey-style PNG charts (quarterly inflection, gross margin evolution, capacity roadmap, EPS surprise, price/MA) plus Mermaid diagrams (value chain, customer adoption cascade).
+1. **Full multi-guru report** `{TICKER}_멀티구루_{YYYYMMDD}.md` (~50-100K chars)
+   - Part 1: company deep-dive (1.1 business essence → 1.8 technical + flow)
+   - Part 1.2b: Super-Investor Ownership Sweep (US only — 16 manager × 3 quarters, hit rate + trajectory)
+   - Part 1.4b: Earnings Call Pulse (US only — T-2/T-1/T0 surge/shift/faded)
+   - Part 1.5: 18-month disclosure 3-tier analysis (body parsing)
+   - Part 2: 5 guru framework analyses
+   - Part 3: weighted verdict + monitoring KPIs
+
+2. **Compressed CEO decision memo** `{TICKER}_투자검토_{YYYYMMDD}.md` (~3-7K chars)
+   - 30-second BUY/HOLD/SELL/AVOID verdict
+   - 1-line thesis
+   - 3 evidence points
+   - Single biggest risk
+   - Position management plan
+   - Korean portfolio cross-reference
+
+3. **Thesis persuasion paper** `{TICKER}_thesis_{YYYYMMDD}.md` (~40-60KB, 700-1000 lines) **[Step 3.6 — added 2026-05]**
+   - Mermaid causal chain (one-page summary)
+   - Consensus matrix vs your alpha location (Bull) or chase-trap location (Bear)
+   - Fundamentals verification (recent earnings surprise pattern)
+   - Differentiation matrix vs competitors
+   - Picks-and-shovels peer PSR/PER comparison
+   - 3 options above consensus (Bull) or 5 hidden bear catalysts (Bear)
+   - Catalyst Gantt timeline (24 months)
+   - 4-5 price scenarios with probability-weighted expected value
+   - **Honest risk evaluation** (Bull thesis lists what could go right for Bear, Bear thesis lists what could go right for Bull)
+   - Korean portfolio cross-reference table
+
+**Bull vs Bear symmetry rule**: Bear thesis is NOT a shortened "avoid memo". It is the same 13-section structure with the same 5-6 charts as Bull thesis. Chase stocks need stronger anti-narrative than buy stocks need pro-narrative.
+
+### Charts (5-6 PNG, all required) — Step 3.7
+
+Embedded in the thesis paper at specific section locations:
+
+| # | File | Purpose | Embed location |
+|---|---|---|---|
+| 1 | `chart_price_climax.png` or `chart_price_ma.png` | 1Y price + MA50/150/200 + catalyst annotations + volume subplot | Right after intro Mermaid |
+| 2 | `chart_comparison_matrix.png` (e.g. `chart_be_vs_xxx.png`) | Bull vs Bear contrast or peer matrix | Right after section 0 |
+| 3 | `chart_quarterly_inflection.png` or `chart_quarterly_revenue.png` | 8-12Q revenue trajectory + peak/trough/inflection markers | Section 2 fundamentals |
+| 4 | `chart_psr_comparison.png` or `chart_eps_surprise.png` | Peer-group valuation comparison or EPS surprise pattern | Section 5 picks-and-shovels |
+| 5 | `chart_13f_sweep.png` (US only) | 16 super-investor hit rate vs this stock | Section 3 (3rd signal block) |
+| 6 | `chart_insider_distribution.png` or `chart_capacity_roadmap.png` | Insider sells timeline (Bear) or capacity/revenue forecast (Bull) | Section 6 hidden catalysts |
+
+Style: McKinsey palette (navy `#1E3A5F`, green `#3FA796`, red `#C8454C`, orange `#E89F3D`). Korean fonts (`Apple SD Gothic Neo` chain). Action-title pattern ("Revenue +18% QoQ — first inflection") not descriptive labels ("Revenue by Quarter"). Source attribution at chart bottom.
+
+Mermaid diagrams (inline) for causal chains, value chain, and catalyst timeline.
 
 ## Install
 
@@ -119,6 +162,8 @@ This skill is opinionated about what "institutional-grade" means:
 - **Quarterly granularity** (12 quarters), not just annual
 - **18-month disclosure body parsing**, not just titles (3-Tier filtering: 8-K Item 5.02 / 2.02 / 5.07 priority for US, 주요사항보고 priority for Korea)
 - **5 guru weighted consensus**, not single-framework — verdict is the weighted average + transcript pulse signal
+- **3 deliverables + 5-6 charts always**, never skipped — full report + compressed memo + thesis persuasion paper. Bull and Bear thesis follow the same structure (no asymmetry).
+- **Step 3.6/3.7 ratchet rule (added 2026-05)**: Once the BE Bloom Energy analysis defined the thesis-paper-plus-charts standard, NVTS regression test caught a double-omission. Skill template now codifies it explicitly so future analyses can't silently drop to baseline.
 
 ## License
 
